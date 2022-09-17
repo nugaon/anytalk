@@ -7,14 +7,18 @@ interface Props {
   bee: Bee
   myEthAddress: string | null
   othersEthAddress: string | null
+  othersName: string | null
   myMessages: MessageFormat[]
   setMyMessages: (value: MessageFormat[]) => void
 }
+
+const MAX_FETCH_COUNT = 7
 
 export default function ListMessages({
   bee,
   myEthAddress,
   othersEthAddress,
+  othersName,
   myMessages,
   setMyMessages,
 }: Props): ReactElement {
@@ -88,7 +92,7 @@ export default function ListMessages({
       // from the other guy
       let fetchCount = fetchIndexToInt(latestBro.feedIndex) - otherLastFetchIndex
 
-      if (fetchCount > 3) fetchCount = 3
+      if (fetchCount > MAX_FETCH_COUNT) fetchCount = MAX_FETCH_COUNT
       otherLastFetchIndex = fetchIndexToInt(latestBro.feedIndex)
       await saveLocalStorage('other_last_fetch_index', String(otherLastFetchIndex))
 
@@ -119,7 +123,7 @@ export default function ListMessages({
 
         let fetchCount = fetchIndexToInt(latesMine.feedIndex) - mineLastFetchIndex
 
-        if (fetchCount > 3) fetchCount = 3
+        if (fetchCount > MAX_FETCH_COUNT) fetchCount = MAX_FETCH_COUNT
         mineLastFetchIndex = fetchIndexToInt(latesMine.feedIndex)
         await saveLocalStorage('mine_last_fetch_index', String(mineLastFetchIndex))
 
@@ -150,7 +154,7 @@ export default function ListMessages({
         <h3>Messages</h3>
         <Row>
           <Col style={{ textAlign: 'left', fontWeight: 'bold' }}>You</Col>
-          <Col style={{ textAlign: 'right', fontWeight: 'bold' }}>Bro</Col>
+          <Col style={{ textAlign: 'right', fontWeight: 'bold' }}>{othersName || 'Bro'}</Col>
         </Row>
         <div style={{ padding: '12px 0' }}>
           {listMessages.map(listMessage => (

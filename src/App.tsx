@@ -3,18 +3,30 @@ import { Bee, Utils } from '@ethersphere/bee-js'
 import randomBytes from 'randombytes'
 import { Buffer } from 'buffer'
 import Wallet from 'ethereumjs-wallet'
-import React, { ChangeEvent, useEffect, useState } from 'react'
-import { Button, Container, Form, FormControl, Stack } from 'react-bootstrap'
+import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react'
+import { Button, Container, Form, FormControl, ListGroup, ListGroupItemProps, Stack } from 'react-bootstrap'
 import Web3Modal, { IProviderOptions } from 'web3modal'
 import './App.css'
 import ListMessages from './Messages'
+import * as Icon from 'react-bootstrap-icons'
 import SendMessage from './SendMessage'
 import { prefixAddress } from './Utils'
+import { FriendList } from './services/friendlist'
+
+const friendList = new FriendList()
+
+interface Buddy {
+  name: string
+  address: string
+}
 
 function App() {
   // # nugaon # mollas # metacertain
   // default bee is pointing to the gateway
   const [bee, setBee] = useState<Bee>(new Bee('http://localhost:1633'))
+  const [friends, setFriends] = useState<React.ReactElement[]>([])
+  const [showAddFriend, setShowAddFriend] = useState(false)
+  const [buddy, setBuddy] = useState<Buddy | null>(null)
   const [privkeyOrSigner, setPrivkeyOrSigner] = useState<Uint8Array | Signer>(randomBytes(32))
   const [wallet, setWallet] = useState<Wallet | null>(null)
   const [otherEthAddress, setOtherEthAddress] = useState<string | null>(null)
@@ -86,6 +98,9 @@ function App() {
         setByteKey(key)
       }
     }
+
+    // load friends
+    setFriends(friendListItems())
   }, [])
 
   useEffect(() => {
@@ -97,6 +112,45 @@ function App() {
     setOtherEthAddress(e.target.value)
     setMyMessages([])
     //other's messages are set in the listMessages
+  }
+
+  const onSubmitAddFriend = (e: React.SyntheticEvent) => {
+    e.preventDefault()
+    const target = e.target as typeof e.target & {
+      name: { value: string }
+      address: { value: string }
+    }
+    console.log('target', target.name.value, target.address.value)
+
+    // friend handling
+    friendList.addFriend(target.name.value, target.address.value)
+    chooseBuddy(target.name.value, target.address.value)
+    setFriends(friendListItems())
+    setShowAddFriend(false)
+    //other's messages are set in the listMessages
+  }
+
+  const chooseBuddy = (name: string, address: string) => {
+    setBuddy({ name, address })
+    setOtherEthAddress(address)
+    setMyMessages([])
+  }
+
+  const friendListItems = (): React.ReactElement[] => {
+    const items: React.ReactElement[] = []
+    for (const [name, address] of Object.entries(friendList.getFriends())) {
+      items.push(
+        <ListGroup.Item key={name} onClick={() => chooseBuddy(name, address)} action>
+          {name}
+        </ListGroup.Item>,
+      )
+    }
+
+    return items
+  }
+
+  const onShowAddFriendClick = () => {
+    setShowAddFriend(true)
   }
 
   return (
@@ -124,14 +178,40 @@ function App() {
         <hr />
 
         <div className="centerDiv">
-          <Form.Label htmlFor="basic-url">Ethereum address of your chatpartner</Form.Label>
-          <FormControl
-            id="basic-url"
-            aria-describedby="basic-addon3"
-            value={otherEthAddress || ''}
-            onChange={onEthAddressChange}
-            style={{ textAlign: 'center' }}
-          />
+          <h3>
+            <span>Friends</span>{' '}
+            <span hidden={showAddFriend} onClick={onShowAddFriendClick}>
+              <Icon.PlusCircleFill />
+            </span>
+            <span hidden={!showAddFriend} onClick={() => setShowAddFriend(false)}>
+              <Icon.DashCircleFill />
+            </span>
+          </h3>
+          <Form
+            onSubmit={onSubmitAddFriend}
+            hidden={!showAddFriend && Boolean(Object.entries(friends).length)}
+            style={{ margin: '24px' }}
+          >
+            <Form.Group className="mb-3" controlId="formBasicEmail">
+              <Form.Label>Name</Form.Label>
+              <FormControl aria-describedby="basic-addon3" style={{ textAlign: 'center' }} name="name" />
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="formBasicEmail">
+              <Form.Label>Ethereum address</Form.Label>
+              <FormControl aria-describedby="basic-addon3" style={{ textAlign: 'center' }} name="address" />
+            </Form.Group>
+
+            <Button variant="primary" type="submit">
+              Add
+            </Button>
+          </Form>
+
+          <div>
+            <ListGroup style={{ maxHeight: '120px', overflow: 'hidden', overflowY: 'scroll' }}>
+              {[...friends]}
+            </ListGroup>
+          </div>
         </div>
 
         <hr />
@@ -143,6 +223,7 @@ function App() {
             othersEthAddress={otherEthAddress}
             myMessages={myMessages}
             setMyMessages={setMyMessages}
+            othersName={buddy?.name || null}
           />
 
           <hr />
