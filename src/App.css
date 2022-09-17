@@ -1,0 +1,38 @@
+.App {
+  text-align: center;
+  min-height: 100vh;
+  padding: 12px !important;
+  /* align-items: center;
+  justify-content: top; */
+  font-family: 'Quicksand', sans-serif !important;
+  color: white !important;
+  background-color: #282c34;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    -webkit-transform: translate3d(0, -100%, 0);
+    transform: translate3d(0, -100%, 0);
+  }
+
+  to {
+    opacity: 1;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.fadeInDown {
+  -webkit-animation-name: fadeInDown;
+  animation-name: fadeInDown;
+}
+
+.font-weight-bold {
+  font-weight: bold;
+}
+
+.centerDiv {
+  justify-content: center;
+  display: inline-block;
+}
