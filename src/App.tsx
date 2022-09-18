@@ -163,15 +163,11 @@ function App() {
 
       <Container className="maincontent">
         <Stack gap={2}>
-          <div>Your ETH address is</div>
           <div className="font-weight-bold">
-            <span>{myEthAddress}</span>
-          </div>
-          <div hidden={walletConnected}>
-            <div>OR</div>
-            <div>
-              <Button onClick={() => connectWallet()}>Connect Wallet</Button>
-            </div>
+            <span>{myEthAddress} </span>
+            <span hidden={walletConnected}>
+              <Icon.Wallet2 onClick={() => connectWallet()} style={{ cursor: 'pointer' }} />
+            </span>
           </div>
         </Stack>
 
