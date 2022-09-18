@@ -4,7 +4,7 @@ import randomBytes from 'randombytes'
 import { Buffer } from 'buffer'
 import Wallet from 'ethereumjs-wallet'
 import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react'
-import { Button, Container, Form, FormControl, ListGroup, ListGroupItemProps, Stack } from 'react-bootstrap'
+import { Button, Col, Container, Form, FormControl, ListGroup, ListGroupItemProps, Row, Stack } from 'react-bootstrap'
 import Web3Modal, { IProviderOptions } from 'web3modal'
 import './App.css'
 import ListMessages from './Messages'
@@ -177,64 +177,70 @@ function App() {
 
         <hr />
 
-        <div className="centerDiv">
-          <h3>
-            <span>Friends</span>{' '}
-            <span hidden={showAddFriend} onClick={onShowAddFriendClick}>
-              <Icon.PlusCircleFill />
-            </span>
-            <span hidden={!showAddFriend} onClick={() => setShowAddFriend(false)}>
-              <Icon.DashCircleFill />
-            </span>
-          </h3>
-          <Form
-            onSubmit={onSubmitAddFriend}
-            hidden={!showAddFriend && Boolean(Object.entries(friends).length)}
-            style={{ margin: '24px' }}
-          >
-            <Form.Group className="mb-3" controlId="formBasicEmail">
-              <Form.Label>Name</Form.Label>
-              <FormControl aria-describedby="basic-addon3" style={{ textAlign: 'center' }} name="name" />
-            </Form.Group>
+        <Container fluid="md">
+          <Row>
+            <Col style={{ marginBottom: 24 }}>
+              <div className="centerDiv">
+                <h3>
+                  <span>Friends</span>{' '}
+                  <span hidden={showAddFriend} onClick={onShowAddFriendClick} style={{ cursor: 'pointer' }}>
+                    <Icon.PlusCircleFill />
+                  </span>
+                  <span hidden={!showAddFriend} onClick={() => setShowAddFriend(false)} style={{ cursor: 'pointer' }}>
+                    <Icon.DashCircleFill />
+                  </span>
+                </h3>
+                <Form
+                  onSubmit={onSubmitAddFriend}
+                  hidden={!showAddFriend && Boolean(Object.entries(friends).length)}
+                  style={{ margin: '24px' }}
+                >
+                  <Form.Group className="mb-3" controlId="formBasicEmail">
+                    <Form.Label>Name</Form.Label>
+                    <FormControl aria-describedby="basic-addon3" style={{ textAlign: 'center' }} name="name" />
+                  </Form.Group>
 
-            <Form.Group className="mb-3" controlId="formBasicEmail">
-              <Form.Label>Ethereum address</Form.Label>
-              <FormControl aria-describedby="basic-addon3" style={{ textAlign: 'center' }} name="address" />
-            </Form.Group>
+                  <Form.Group className="mb-3" controlId="formBasicEmail">
+                    <Form.Label>Ethereum address</Form.Label>
+                    <FormControl aria-describedby="basic-addon3" style={{ textAlign: 'center' }} name="address" />
+                  </Form.Group>
 
-            <Button variant="primary" type="submit">
-              Add
-            </Button>
-          </Form>
+                  <Button variant="primary" type="submit">
+                    Add
+                  </Button>
+                </Form>
 
-          <div>
-            <ListGroup style={{ maxHeight: '120px', overflow: 'hidden', overflowY: 'scroll' }}>
-              {[...friends]}
-            </ListGroup>
-          </div>
-        </div>
+                <div>
+                  <ListGroup style={{ maxHeight: '120px', overflow: 'hidden', overflowY: 'scroll' }}>
+                    {[...friends]}
+                  </ListGroup>
+                </div>
+              </div>
+            </Col>
 
-        <hr />
+            <Col>
+              <div style={{ maxWidth: 300 }} className="centerDiv">
+                <ListMessages
+                  bee={bee}
+                  myEthAddress={myEthAddress}
+                  othersEthAddress={otherEthAddress}
+                  myMessages={myMessages}
+                  setMyMessages={setMyMessages}
+                  othersName={buddy?.name || null}
+                />
 
-        <div style={{ maxWidth: 300 }} className="centerDiv">
-          <ListMessages
-            bee={bee}
-            myEthAddress={myEthAddress}
-            othersEthAddress={otherEthAddress}
-            myMessages={myMessages}
-            setMyMessages={setMyMessages}
-            othersName={buddy?.name || null}
-          />
+                <hr />
 
-          <hr />
-
-          <SendMessage
-            bee={bee}
-            otherEthAddress={otherEthAddress}
-            privKey={privkeyOrSigner}
-            onSendMessage={message => setMyMessages([...myMessages, message])}
-          />
-        </div>
+                <SendMessage
+                  bee={bee}
+                  otherEthAddress={otherEthAddress}
+                  privKey={privkeyOrSigner}
+                  onSendMessage={message => setMyMessages([...myMessages, message])}
+                />
+              </div>
+            </Col>
+          </Row>
+        </Container>
       </Container>
     </Container>
   )

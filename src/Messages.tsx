@@ -1,7 +1,14 @@
 import { Bee, Utils } from '@ethersphere/bee-js'
 import { ReactElement, useEffect, useState } from 'react'
 import { Button, Col, Row, Spinner } from 'react-bootstrap'
-import { decodeMessage, fetchIndexToInt, hashTopicForMessage, previousIdentifiers, saveLocalStorage } from './Utils'
+import {
+  decodeMessage,
+  fetchIndexToInt,
+  hashTopicForMessage,
+  isEthAddrCaseIns,
+  previousIdentifiers,
+  saveLocalStorage,
+} from './Utils'
 
 interface Props {
   bee: Bee
@@ -12,7 +19,7 @@ interface Props {
   setMyMessages: (value: MessageFormat[]) => void
 }
 
-const MAX_FETCH_COUNT = 7
+const MAX_FETCH_COUNT = 5
 
 export default function ListMessages({
   bee,
@@ -67,6 +74,7 @@ export default function ListMessages({
 
   useEffect(() => {
     setOtherMessages([])
+    refreshOthersMessage()
   }, [othersEthAddress])
 
   async function refreshOthersMessage() {
@@ -78,6 +86,12 @@ export default function ListMessages({
 
     if (!myEthAddress) {
       console.error('There is no available eth address')
+
+      return
+    }
+
+    if (!isEthAddrCaseIns(othersEthAddress)) {
+      console.error('eth address of the other parti is invalid')
 
       return
     }
@@ -175,7 +189,7 @@ export default function ListMessages({
             </div>
           ))}
         </div>
-        <div hidden={listMessages.length > 0}>There are no loaded messages yet. Smash the Refresh button.</div>
+        <div hidden={listMessages.length > 0}>There are no loaded messages yet.</div>
         <div style={{ minHeight: 42 }}>
           <Spinner animation="grow" hidden={!loadListMessages} />
         </div>

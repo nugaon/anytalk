@@ -99,3 +99,15 @@ export function hashTopicForMessage(address: string): Utils.Bytes<32> {
 export function prefixAddress(address: string): string {
   return address.startsWith('0x') ? address : `0x${address}`
 }
+
+/**
+ * Check if this is all caps or small caps eth address (=address without checksum)
+ *
+ * @param address Ethereum address as hex string
+ */
+export function isEthAddrCaseIns(address: string): address is string {
+  // Check it's string, all small caps or all all caps hex and 40 chars long without the `0x` prefix
+  return (
+    typeof address === 'string' && (/^(0x|0X)?[0-9a-f]{40}$/.test(address) || /^(0x|0X)?[0-9A-F]{40}$/.test(address))
+  )
+}
